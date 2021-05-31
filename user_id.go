@@ -1,37 +1,27 @@
 package trace
 
-import (
-	"context"
-	"net/http"
-)
-
-type userIdctxKey int
+import "context"
 
 const (
-	userIDHeaderKey = "X-SM-User-ID"
-
-	userIdCtxKey userIdctxKey = iota
+	userCtxKey ctxKey = iota
 )
 
-// UserIDFromHeader get user id from header
-func UserIDFromHeader(header http.Header) string {
-	return header.Get(userIDHeaderKey)
-}
-
-// UserIDToHeader set user id to the header
-func UserIDToHeader(header http.Header, UserID string) {
-	header.Set(userIDHeaderKey, UserID)
-}
-
-// UserIDFromContext get User id from context
-func UserIDFromContext(ctx context.Context) string {
-	if key, ok := ctx.Value(userIdCtxKey).(string); ok {
-		return key
+func GetCurrentUserFromContext(ctx context.Context) *User {
+	if user, ok := ctx.Value(userCtxKey).(*User); ok {
+		return user
 	}
-	return ""
+	return nil
 }
 
-// ContextWithUserID set User id into the context
-func ContextWithUserID(ctx context.Context, UserId string) context.Context {
-	return context.WithValue(ctx, userIdCtxKey, UserId)
+func ContextWithUser(ctx context.Context, user *User) context.Context {
+	return context.WithValue(ctx, userCtxKey, user)
+}
+
+func GetUserIDFromContext(ctx context.Context) string {
+	user := GetCurrentUserFromContext(ctx)
+	var userID string
+	if user != nil {
+		userID = user.Id
+	}
+	return userID
 }
