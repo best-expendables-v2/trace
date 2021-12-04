@@ -2,8 +2,11 @@ package trace
 
 import "context"
 
+type userIdctxKey int
+
 const (
 	userCtxKey ctxKey = iota
+	userIdCtxKey userIdctxKey = iota
 )
 
 func GetCurrentUserFromContext(ctx context.Context) *User {
@@ -24,4 +27,8 @@ func GetUserIDFromContext(ctx context.Context) string {
 		userID = user.Id
 	}
 	return userID
+}
+
+func ContextWithUserID(ctx context.Context, UserId string) context.Context {
+	return context.WithValue(ctx, userIdCtxKey, UserId)
 }
